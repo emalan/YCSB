@@ -33,7 +33,7 @@ LICENSE file.
     <repository>
       <id>spring-libs</id>
       <name>spring libs repo</name>
-      <url>https://repo.spring.io/libs-release</url>
+      <url>http://repo.spring.io/libs-release</url>
     </repository>
   </repositories>
   <properties>
