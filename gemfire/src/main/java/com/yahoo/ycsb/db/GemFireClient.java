@@ -23,6 +23,10 @@ import com.gemstone.gemfire.cache.client.ClientCacheFactory;
 import com.gemstone.gemfire.cache.client.ClientRegionFactory;
 import com.gemstone.gemfire.cache.client.ClientRegionShortcut;
 import com.gemstone.gemfire.internal.admin.remote.DistributionLocatorId;
+import com.gemstone.gemfire.internal.cache.GemFireCacheImpl;
+import com.gemstone.gemfire.pdx.JSONFormatter;
+import com.gemstone.gemfire.pdx.PdxInstance;
+import com.gemstone.gemfire.pdx.PdxInstanceFactory;
 import com.yahoo.ycsb.*;
 
 import java.util.*;
@@ -48,6 +52,8 @@ import java.util.*;
  * working directory to override these region definitions.</p>
  */
 public class GemFireClient extends DB {
+
+  private static final String PDXTYPE = JSONFormatter.JSON_CLASSNAME;
   /**
    * property name of the port where GemFire server is listening for connections.
    */
@@ -110,6 +116,7 @@ public class GemFireClient extends DB {
         if (locatorStr != null) {
           cf.set("locators", locatorStr);
         }
+        cf.setPdxReadSerialized(true);
         cache = cf.create();
         isClient = false;
         return;
@@ -132,16 +139,16 @@ public class GemFireClient extends DB {
   @Override
   public Status read(String table, String key, Set<String> fields,
                      HashMap<String, ByteIterator> result) {
-    Region<String, Map<String, byte[]>> r = getRegion(table);
-    Map<String, byte[]> val = r.get(key);
+    Region<String, PdxInstance> r = getRegion(table);
+    PdxInstance val = r.get(key);
     if (val != null) {
       if (fields == null) {
-        for (Map.Entry<String, byte[]> entry : val.entrySet()) {
-          result.put(entry.getKey(), new ByteArrayByteIterator(entry.getValue()));
+        for (String fieldName : val.getFieldNames()) {
+          result.put(fieldName, new ByteArrayByteIterator((byte[]) val.getField(fieldName)));
         }
       } else {
         for (String field : fields) {
-          result.put(field, new ByteArrayByteIterator(val.get(field)));
+          result.put(field, new ByteArrayByteIterator((byte[]) val.getField(field)));
         }
       }
       return Status.OK;
@@ -174,25 +181,27 @@ public class GemFireClient extends DB {
     return Status.OK;
   }
 
-  private Map<String, byte[]> convertToBytearrayMap(Map<String, ByteIterator> values) {
-    Map<String, byte[]> retVal = new HashMap<String, byte[]>();
+  private PdxInstance convertToBytearrayMap(Map<String, ByteIterator> values) {
+    GemFireCacheImpl gci = (GemFireCacheImpl) CacheFactory.getAnyInstance();
+    PdxInstanceFactory pdxInstanceFactory = gci.createPdxInstanceFactory(PDXTYPE);
+
     for (Map.Entry<String, ByteIterator> entry : values.entrySet()) {
-      retVal.put(entry.getKey(), entry.getValue().toArray());
+      pdxInstanceFactory.writeByteArray(entry.getKey(), entry.getValue().toArray());
     }
-    return retVal;
+    return pdxInstanceFactory.create();
   }
 
-  private Region<String, Map<String, byte[]>> getRegion(String table) {
+  private Region<String, PdxInstance> getRegion(String table) {
 
-    Region<String, Map<String, byte[]>> r = cache.getRegion(table);
+    Region<String, PdxInstance> r = cache.getRegion(table);
     if (r == null) {
       try {
         if (isClient) {
-          ClientRegionFactory<String, Map<String, byte[]>> crf =
+          ClientRegionFactory<String, PdxInstance> crf =
             ((ClientCache) cache).createClientRegionFactory(ClientRegionShortcut.PROXY);
           r = crf.create(table);
         } else {
-          RegionFactory<String, Map<String, byte[]>> rf = ((Cache) cache).createRegionFactory(RegionShortcut.PARTITION);
+          RegionFactory<String, PdxInstance> rf = ((Cache) cache).createRegionFactory(RegionShortcut.PARTITION);
           r = rf.create(table);
         }
       } catch (RegionExistsException e) {
