@@ -122,9 +122,13 @@ LICENSE file.
     <module>hbase098</module>
     <module>hbase10</module>
     <module>hypertable</module>
+    <!-- 
     <module>infinispan</module>
+     -->
     <module>jdbc</module>
+    <!-- 
     <module>kudu</module>
+     -->
     <!--<module>mapkeeper</module>-->
     <module>memcached</module>
     <module>mongodb</module>
