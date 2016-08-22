@@ -96,6 +96,7 @@ LICENSE file.
     <aerospike.version>3.1.2</aerospike.version>
     <solr.version>5.4.0</solr.version>
     <arangodb.version>2.7.3</arangodb.version>
+    <hazelcast.version>3.7</hazelcast.version>
   </properties>
 
   <modules>
@@ -134,6 +135,7 @@ LICENSE file.
     <module>s3</module>
     <module>solr</module>
     <module>tarantool</module>
+    <module>hazelcast</module>
     <!--<module>voldemort</module>-->
   </modules>
 
