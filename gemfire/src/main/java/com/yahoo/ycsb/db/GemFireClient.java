@@ -134,6 +134,9 @@ public class GemFireClient extends DB {
       ccf.addPoolLocator(locator.getHost().getCanonicalHostName(), locator.getPort());
     }
     cache = ccf.create();
+
+    Region userTable = getRegion("usertable");
+    userTable.removeAll(userTable.keySetOnServer());
   }
 
   @Override
