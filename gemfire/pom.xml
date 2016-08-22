@@ -29,6 +29,13 @@ LICENSE file.
   <name>GemFire DB Binding</name>
   <packaging>jar</packaging>
 
+  <repositories>
+    <repository>
+      <id>spring-libs</id>
+      <name>spring libs repo</name>
+      <url>https://repo.spring.io/libs-release</url>
+    </repository>
+  </repositories>
   <properties>
     <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
   </properties>
