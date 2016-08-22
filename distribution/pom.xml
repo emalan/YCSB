@@ -189,6 +189,11 @@ LICENSE file.
       <artifactId>hazelcast-binding</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.yahoo.ycsb</groupId>
+      <artifactId>gemfire-binding</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 <!--
     <dependency>
       <groupId>com.yahoo.ycsb</groupId>
