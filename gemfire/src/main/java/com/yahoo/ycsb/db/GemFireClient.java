@@ -201,7 +201,7 @@ public class GemFireClient extends DB {
       try {
         if (isClient) {
           ClientRegionFactory<String, PdxInstance> crf =
-            ((ClientCache) cache).createClientRegionFactory(ClientRegionShortcut.PROXY);
+              ((ClientCache) cache).createClientRegionFactory(ClientRegionShortcut.PROXY);
           r = crf.create(table);
         } else {
           RegionFactory<String, PdxInstance> rf = ((Cache) cache).createRegionFactory(RegionShortcut.PARTITION);
