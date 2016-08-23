@@ -86,7 +86,7 @@ DATABASES = {
     "solr"         : "com.yahoo.ycsb.db.SolrClient",
     "tarantool"    : "com.yahoo.ycsb.db.TarantoolClient",
     "voldemort"    : "com.yahoo.ycsb.db.VoldemortClient",
-    "hazelcast"    : "com.yahoo.ycsb.db.HazelcastClient"
+    "hazelcast"    : "com.yahoo.ycsb.db.HazelcastClient",
     "gemfire"      : "com.yahoo.ycsb.db.GemFireClient"
 }
 
