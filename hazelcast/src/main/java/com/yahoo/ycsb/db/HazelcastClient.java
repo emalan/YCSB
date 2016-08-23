@@ -27,6 +27,7 @@ import java.util.Vector;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.config.GroupConfig;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IMap;
 import com.yahoo.ycsb.ByteArrayByteIterator;
 import com.yahoo.ycsb.ByteIterator;
 import com.yahoo.ycsb.DB;
@@ -73,7 +74,8 @@ public class HazelcastClient extends DB {
 		Properties props = getProperties();
 		
 		hazelcastInstance = com.hazelcast.client.HazelcastClient.newHazelcastClient(clientConfig(props));
-		hazelcastInstance.getMap(TABLE);
+		IMap<Object,Object> map = hazelcastInstance.getMap(TABLE);
+		map.clear();
 	}
 
 	@Override
