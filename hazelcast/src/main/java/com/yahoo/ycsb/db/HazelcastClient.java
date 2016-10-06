@@ -44,17 +44,19 @@ public class HazelcastClient extends DB {
 
 	private final static String CLUSTER_MEMBERS = "hazelcast.members";
 	
-	private final static String CLUSTER_MEMBERS_DEFAULT = "gridhaz-dt-a1d.ula.comcast.net:5701,gridhaz-dt-a2d.ula.comcast.net:5701,gridhaz-dt-a3d.ula.comcast.net:5701,gridhaz-dt-a4d.ula.comcast.net:5701";
+	private final static String CLUSTER_MEMBERS_DEFAULT = "gridhaz-as-a1d.sys.comcast.net:5701,gridhaz-as-a2d.sys.comcast.net:5701,gridhaz-as-a3d.sys.comcast.net:5701,gridhaz-as-a4d.sys.comcast.net:5701";
 
 	private final static String GROUP_NAME = "hazelcast.groupName";
 	
-	private final static String GROUP_NAME_DEFAULT = "dev";
+	private final static String GROUP_NAME_DEFAULT = "comcast-eval-env";
 
 	private final static String GROUP_PASSWORD = "hazelcast.password";
 
-	private static final String GROUP_PASSWORD_DEFAULT  = "dev";
+	private static final String GROUP_PASSWORD_DEFAULT  = "comcast-eval-env";
 	
 	private static final String TABLE = "usertable";
+	
+	private static final int CONNECTION_TIMEOUT = 10000;
 
 	private HazelcastInstance hazelcastInstance;
 
@@ -62,7 +64,7 @@ public class HazelcastClient extends DB {
 	 * true if ycsb client runs as a client to a Hazelcast cache server.
 	 */
 	private boolean isClient;
-
+	
 	/*
 	 * (non-Javadoc)
 	 *
@@ -75,7 +77,7 @@ public class HazelcastClient extends DB {
 		
 		hazelcastInstance = com.hazelcast.client.HazelcastClient.newHazelcastClient(clientConfig(props));
 		IMap<Object,Object> map = hazelcastInstance.getMap(TABLE);
-		map.clear();
+		//map.clear();
 	}
 
 	@Override
@@ -137,9 +139,9 @@ public class HazelcastClient extends DB {
 		ClientConfig clientConfig = new ClientConfig();
 		List<String> members = Arrays.asList(clusterMembers.split(","));
 		clientConfig.getNetworkConfig().setAddresses(members);
-		clientConfig.getNetworkConfig().setConnectionAttemptLimit(10);
+		clientConfig.getNetworkConfig().setConnectionAttemptLimit(0);
 		clientConfig.getNetworkConfig().setConnectionAttemptPeriod(24 * 60);
-		clientConfig.getNetworkConfig().setConnectionTimeout(1000);
+		clientConfig.getNetworkConfig().setConnectionTimeout(CONNECTION_TIMEOUT);
 		GroupConfig groupConfig = new GroupConfig();
 		groupConfig.setName(groupName);
 		groupConfig.setPassword(password);
@@ -164,5 +166,10 @@ public class HazelcastClient extends DB {
 			e.printStackTrace(System.out);
 			e.printStackTrace(System.err);
 		}
+	}
+	
+	@Override
+	public void cleanup() throws DBException {
+		hazelcastInstance.shutdown();
 	}
 }
